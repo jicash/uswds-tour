@@ -7,7 +7,7 @@ export default defineConfig({
       entry: '../src/uswds-tour.js',
       name: 'USWDSTour',
       formats: ['es', 'iife'],
-      fileName: (format) => format === 'iife' ? 'uswds-tour.min' : 'uswds-tour'
+      fileName: (format) => format === 'iife' ? 'uswds-tour.min.js' : 'uswds-tour.js'
     },
     outDir: '../dist',
     emptyOutDir: true,
