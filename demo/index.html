@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>USWDS Tour Demo</title>
+    <link
+      rel="stylesheet"
+      href="assets/uswds.min.css"
+    />
+  </head>
+  <body class="usa-prose padding-4" style="min-height:100%;">
+
+
+    <div>
+      <div class="margin-bottom-4"><button id="start-tour" class="usa-button usa-button--accent-cool">Start Tour</button></div>
+
+      <div class="display-flex flex-align-center gap-1 margin-bottom-4">
+        <button id="tour-btn-1" class="usa-button" data-tour-step="1" data-tour-title="First Button" data-tour-description="This is the first step of the tour. Click to show its tooltip individually." data-tour-position="bottom">First Button</button>
+        <button id="show-tooltip-1" class="usa-button usa-button--outline">Show Tooltip for First Button</button>
+      </div>
+
+      <div class="margin-bottom-4"><button id="tour-btn-2" class="usa-button usa-button--outline" data-tour-step="2" data-tour-title="Second Button (Disabled)" data-tour-description="This button is disabled but still part of the tour." data-tour-position="bottom" disabled>Second Button (Disabled)</button></div>
+
+      <div class="display-flex flex-align-center gap-1 margin-bottom-4">
+        <button id="tour-btn-3" class="usa-button usa-button--outline" data-tour-step="4" data-tour-title="Third Button" data-tour-description="This is the third step. Try keyboard navigation!" data-tour-position="right">Third Button</button>
+        <button id="show-tooltip-3" class="usa-button usa-button--outline">Show Tooltip for Third Button</button>
+      </div>
+
+      <div class="display-flex flex-justify-end margin-bottom-4">
+        <button id="tour-btn-4" class="usa-button usa-button--outline" data-tour-step="3" data-tour-title="Fourth Button" data-tour-description="This is the fourth step. The modal should appear to the left of this button." data-tour-position="left">Fourth Button</button>
+      </div>
+
+      <div class="margin-bottom-4"><button id="tour-btn-longdesc" class="usa-button usa-button--outline" data-tour-step="5" data-tour-title="Long Description" data-tour-description="This step has a very long description to test overflow and scrolling. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque euismod, urna eu tincidunt consectetur, nisi nisl aliquam nunc, eget aliquam massa nisl quis neque. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Etiam at massa nec urna cursus dictum." data-tour-position="top">Long Description</button></div>
+
+      <div class="margin-bottom-4"><button id="restart-tour" class="usa-button usa-button--outline" data-tour-step="6" data-tour-title="Restart Tour" data-tour-description="This button restarts the tour from step one. It is enabled after the tour completes." data-tour-position="top" disabled>Restart Tour</button></div>
+    </div>
+
+    <script type="module">
+      import { showTooltip } from '../src/uswds-tour.js'
+
+      // Show individual tooltips
+      document.getElementById('show-tooltip-1').addEventListener('click', () => {
+        showTooltip({
+          element: '#tour-btn-1',
+          title: 'First Button',
+          description: 'This is the first step of the tour. Click to show its tooltip individually.',
+          position: 'bottom',
+          className: 'maxw-tablet',
+          showControls: true
+        })
+      })
+      document.getElementById('show-tooltip-3').addEventListener('click', () => {
+        showTooltip({
+          element: '#tour-btn-3',
+          title: 'Third Button',
+          description: 'This is the third step. Try keyboard navigation!',
+          position: 'bottom',
+          className: 'maxw-tablet',
+          showControls: true
+        })
+      })
+
+      // Tour state logic
+      const btn2 = document.getElementById('tour-btn-2');
+      const restartBtn = document.getElementById('restart-tour');
+      const startTourBtn = document.getElementById('start-tour');
+
+      function enableRestart() {
+        restartBtn.disabled = false;
+      }
+      function disableRestart() {
+        restartBtn.disabled = true;
+      }
+
+      // Start tour (declarative)
+      startTourBtn.addEventListener('click', () => {
+        USWDSTour.startTour([], {
+          onStart: () => {
+            disableRestart();
+          },
+          onComplete: () => {
+            enableRestart();
+          }
+        });
+      });
+
+      // Restart tour
+      restartBtn.addEventListener('click', () => {
+        USWDSTour.startTour([], {
+          onStart: () => {
+            disableRestart();
+          },
+          onComplete: () => {
+            enableRestart();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
