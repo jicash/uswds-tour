@@ -1,3 +1,36 @@
+// Auto-initialize manual triggers for tooltips
+function initTourTriggers() {
+  // Find all elements with data-tour-trigger
+  const tourTargets = document.querySelectorAll('[data-tour-trigger]');
+  tourTargets.forEach(target => {
+    const triggerId = target.getAttribute('data-tour-trigger');
+    if (!triggerId) return;
+    const trigger = document.getElementById(triggerId);
+    if (!trigger) return;
+    // Avoid duplicate listeners by using a named handler and checking for existing
+    const handler = () => {
+      showTooltip({
+        element: target,
+        title: target.getAttribute('data-tour-title') || '',
+        description: target.getAttribute('data-tour-description') || '',
+        position: target.getAttribute('data-tour-position') || 'bottom',
+        className: target.getAttribute('data-tour-class') || '',
+        showControls: false
+      });
+    };
+    // Remove any previous handler to avoid duplicates
+    trigger.removeEventListener('click', handler);
+    trigger.addEventListener('click', handler);
+  });
+}
+
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTourTriggers);
+  } else {
+    initTourTriggers();
+  }
+}
 
 let cachedPageHeight = null;
 
@@ -38,14 +71,6 @@ function getPageHeight() {
  * @returns {void}
  */
 function showTooltip({ element, title, description, position = 'bottom', className = '', showControls = false, onNext, onPrev, onClose, isLastStep = false }) {
-  // Overlay click closes modal
-  overlay.addEventListener('click', (e) => {
-    // Only close if the overlay itself is clicked, not the modal
-    if (e.target === overlay) {
-      remove();
-      if (onClose) onClose();
-    }
-  });
   const target = typeof element === 'string' ? document.querySelector(element) : element;
   if (!target) {
     console.warn('USWDS-Tour: Target element not found.');
@@ -81,6 +106,15 @@ function showTooltip({ element, title, description, position = 'bottom', classNa
   overlay.style.zIndex = 1000;
   overlay.style.pointerEvents = 'auto';
   overlay.style.transition = 'background 0.2s';
+
+  // Overlay click closes modal
+  overlay.addEventListener('click', (e) => {
+    // Only close if the overlay itself is clicked, not the modal
+    if (e.target === overlay) {
+      remove();
+      if (onClose) onClose();
+    }
+  });
 
   // SVG mask for the cutout
   const svgNS = 'http://www.w3.org/2000/svg';

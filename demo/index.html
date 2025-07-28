@@ -22,7 +22,7 @@
       <div class="margin-bottom-4"><button id="tour-btn-2" class="usa-button usa-button--outline" data-tour-step="2" data-tour-title="Second Button (Disabled)" data-tour-description="This button is disabled but still part of the tour." data-tour-position="bottom" disabled>Second Button (Disabled)</button></div>
 
       <div class="display-flex flex-align-center gap-1 margin-bottom-4">
-        <button id="tour-btn-3" class="usa-button usa-button--outline" data-tour-step="4" data-tour-title="Third Button" data-tour-description="This is the third step. Try keyboard navigation!" data-tour-position="right">Third Button</button>
+        <button id="tour-btn-3" class="usa-button usa-button--outline" data-tour-step="4" data-tour-title="Third Button" data-tour-description="This is the third step. Try keyboard navigation!" data-tour-position="right" data-tour-trigger="show-tooltip-3">Third Button</button>
         <button id="show-tooltip-3" class="usa-button usa-button--outline">Show Tooltip for Third Button</button>
       </div>
 
@@ -49,16 +49,7 @@
           showControls: true
         })
       })
-      document.getElementById('show-tooltip-3').addEventListener('click', () => {
-        showTooltip({
-          element: '#tour-btn-3',
-          title: 'Third Button',
-          description: 'This is the third step. Try keyboard navigation!',
-          position: 'bottom',
-          className: 'maxw-tablet',
-          showControls: true
-        })
-      })
+      // (No manual event listener needed for show-tooltip-3; handled by data-tour-trigger)
 
       // Tour state logic
       const btn2 = document.getElementById('tour-btn-2');
