@@ -1,12 +1,13 @@
 # USWDS Tour
 
-A lightweight, accessible, dependency-free JavaScript library for creating guided tours and tooltips on USWDS-based sites. Fully Section 508 compliant and easy to integrate.
+An accessible, dependency-free JavaScript library for creating guided tours and tooltips on USWDS-based sites. Fully Section 508 compliant, easy to integrate, and flexible: define steps via HTML attributes or programmatically.
 
 ## Features
 - USWDS modal styling and utility classes
 - Spotlight overlay with cutout for target elements
 - Keyboard navigation and focus management
-- Declarative tour support via HTML attributes
+- Flexible step definition: via HTML attributes or JS array
+- Auto-initialization for tour start and manual tooltips
 - No dependencies, works with any site
 
 
@@ -43,19 +44,18 @@ Show a single tooltip/modal for a target element.
 - `isLastStep` (boolean): If true, "Next" button says "End Tour"
 
 ### startTour(steps, options)
-Start a multi-step guided tour.
+Start a multi-step guided tour. You can define steps in two ways:
 
-- `steps`: Array of step objects (same as showTooltip options, minus handlers)
-- `options`: Optional hooks:
-  - `onStart` (function): Called when tour starts
-  - `onComplete` (function): Called when tour ends
-  - `onStepChange` (function): Called on each step
+- **Programmatic:** Pass an array of step objects to `USWDSTour.startTour(stepsArray, options)`.
+- **Declarative:** Add `data-tour-step`, `data-tour-title`, and `data-tour-description` attributes to elements. Call `startTour()` with no arguments to auto-detect steps from the DOM.
 
-#### Declarative Tour
-You can also add `data-tour-step`, `data-tour-title`, and `data-tour-description` attributes to elements. Call `startTour()` with no arguments to auto-detect steps.
+#### Auto-initialization
+- Add `data-tour-start` to any element (e.g., a button) to automatically attach a click listener that starts the tour—no JS required.
+- Add `data-tour-trigger="your-trigger-id"` to any element to automatically show a tooltip when another element with that ID is clicked.
 
-## Example
+## Examples
 
+**Programmatic steps:**
 ```js
 USWDSTour.startTour([
   {
@@ -69,6 +69,27 @@ USWDSTour.startTour([
     description: 'This is the next step.'
   }
 ]);
+```
+
+**Declarative steps:**
+```html
+<button data-tour-step="1" data-tour-title="Welcome" data-tour-description="Click here to start!">Start</button>
+<!-- ...more steps... -->
+```
+Then call:
+```js
+USWDSTour.startTour();
+```
+
+**Auto-init tour start (no JS needed):**
+```html
+<button data-tour-start>Start Tour</button>
+```
+
+**Manual tooltip trigger:**
+```html
+<button id="show-tooltip-3">Show Tooltip</button>
+<button data-tour-trigger="show-tooltip-3" ...>Target</button>
 ```
 
 ## Accessibility
