@@ -1,3 +1,13 @@
+// Auto-initialize tour start triggers
+function initTourStartTriggers() {
+  const startEls = document.querySelectorAll('[data-tour-start]');
+  startEls.forEach(el => {
+    el.addEventListener('click', () => {
+      startTour([], {});
+    });
+  });
+}
+
 // Auto-initialize manual triggers for tooltips
 function initTourTriggers() {
   // Find all elements with data-tour-trigger
@@ -25,10 +35,14 @@ function initTourTriggers() {
 }
 
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initTourTriggers);
-  } else {
+  function runAllTourAutoInit() {
     initTourTriggers();
+    initTourStartTriggers();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runAllTourAutoInit);
+  } else {
+    runAllTourAutoInit();
   }
 }
 

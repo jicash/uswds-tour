@@ -12,7 +12,7 @@
 
 
     <div>
-      <div class="margin-bottom-4"><button id="start-tour" class="usa-button usa-button--accent-cool">Start Tour</button></div>
+      <div class="margin-bottom-4"><button id="start-tour" class="usa-button usa-button--accent-cool" data-tour-start>Start Tour</button></div>
 
       <div class="display-flex flex-align-center gap-1 margin-bottom-4">
         <button id="tour-btn-1" class="usa-button" data-tour-step="1" data-tour-title="First Button" data-tour-description="This is the first step of the tour. Click to show its tooltip individually." data-tour-position="bottom">First Button</button>
@@ -54,7 +54,6 @@
       // Tour state logic
       const btn2 = document.getElementById('tour-btn-2');
       const restartBtn = document.getElementById('restart-tour');
-      const startTourBtn = document.getElementById('start-tour');
 
       function enableRestart() {
         restartBtn.disabled = false;
@@ -62,18 +61,6 @@
       function disableRestart() {
         restartBtn.disabled = true;
       }
-
-      // Start tour (declarative)
-      startTourBtn.addEventListener('click', () => {
-        USWDSTour.startTour([], {
-          onStart: () => {
-            disableRestart();
-          },
-          onComplete: () => {
-            enableRestart();
-          }
-        });
-      });
 
       // Restart tour
       restartBtn.addEventListener('click', () => {

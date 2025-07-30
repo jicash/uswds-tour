@@ -1,3 +1,11 @@
+function initTourStartTriggers() {
+  const startEls = document.querySelectorAll("[data-tour-start]");
+  startEls.forEach((el) => {
+    el.addEventListener("click", () => {
+      startTour([], {});
+    });
+  });
+}
 function initTourTriggers() {
   const tourTargets = document.querySelectorAll("[data-tour-trigger]");
   tourTargets.forEach((target) => {
@@ -22,10 +30,14 @@ function initTourTriggers() {
   });
 }
 if (typeof window !== "undefined" && typeof document !== "undefined") {
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initTourTriggers);
-  } else {
+  let runAllTourAutoInit = function() {
     initTourTriggers();
+    initTourStartTriggers();
+  };
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", runAllTourAutoInit);
+  } else {
+    runAllTourAutoInit();
   }
 }
 let cachedPageHeight = null;
