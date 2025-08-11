@@ -62,13 +62,23 @@ function showTooltip({ element, title, description, position = "bottom", classNa
     console.warn("USWDS-Tour: Target element not found.");
     return;
   }
+  if (window.innerWidth < 800 && target && typeof target.getBoundingClientRect === "function") {
+    const rect2 = target.getBoundingClientRect();
+    const rem2 = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const modalHeight = Math.floor(window.innerHeight / 3);
+    const modalTop = window.innerHeight - modalHeight;
+    const desiredScroll = window.scrollY + rect2.top - (modalTop - 2 * rem2);
+    if (desiredScroll !== window.scrollY) {
+      window.scrollTo({ top: desiredScroll, behavior: "smooth" });
+    }
+  }
   document.querySelectorAll(".uswds-tour-tooltip, .uswds-tour-overlay, .usa-modal__overlay, .usa-modal").forEach((el) => el.remove());
   const rect = target.getBoundingClientRect();
   const padding = 16;
   const borderRadius = 12;
   const cutout = {
-    x: rect.left - padding,
-    y: rect.top - padding,
+    x: rect.left + window.scrollX - padding,
+    y: rect.top + window.scrollY - padding,
     width: rect.width + 2 * padding,
     height: rect.height + 2 * padding
   };
@@ -103,9 +113,7 @@ function showTooltip({ element, title, description, position = "bottom", classNa
   svg.style.height = `${getPageHeight()}px`;
   svg.style.pointerEvents = "none";
   function updateOverlayDimensions() {
-    cachedPageHeight = null;
     const pageHeight = getPageHeight();
-    overlay.style.height = `${pageHeight}px`;
     svg.setAttribute("width", window.innerWidth);
     svg.setAttribute("height", pageHeight);
     svg.setAttribute("viewBox", `0 0 ${window.innerWidth} ${pageHeight}`);
@@ -155,13 +163,28 @@ function showTooltip({ element, title, description, position = "bottom", classNa
   modal.setAttribute("aria-labelledby", "uswds-tour-title");
   modal.setAttribute("aria-describedby", "uswds-tour-desc");
   modal.style.zIndex = 1001;
-  modal.style.position = "absolute";
-  modal.style.width = "auto";
-  modal.style.height = "auto";
-  modal.style.display = "block";
-  modal.style.minWidth = "320px";
-  modal.style.maxWidth = "400px";
-  modal.style.margin = "0";
+  if (window.innerWidth < 800) {
+    modal.style.position = "fixed";
+    modal.style.left = "0";
+    modal.style.bottom = "0";
+    modal.style.top = "";
+    modal.style.width = "100vw";
+    modal.style.maxWidth = "";
+    modal.style.minWidth = "";
+    modal.style.borderRadius = "0";
+    modal.style.margin = "0";
+    modal.style.height = "auto";
+    modal.style.maxHeight = "420px";
+    modal.style.display = "block";
+  } else {
+    modal.style.position = "absolute";
+    modal.style.width = "auto";
+    modal.style.height = "auto";
+    modal.style.display = "block";
+    modal.style.minWidth = "320px";
+    modal.style.maxWidth = "400px";
+    modal.style.margin = "0";
+  }
   let controls = "";
   if (showControls) {
     const nextLabel = isLastStep ? "End Tour" : "Next";
@@ -188,8 +211,8 @@ function showTooltip({ element, title, description, position = "bottom", classNa
         ${controls}
       </div>
       <button type="button" class="usa-button usa-modal__close" aria-label="Close this window" id="uswds-tour-close">
-        <svg class="usa-icon" aria-hidden="true" focusable="false" role="img" style="width: 1em; height: 1em; vertical-align: middle;">
-          <use href="/assets/img/sprite.svg#close"></use>
+        <svg class="usa-icon padding-right-1" aria-hidden="true" focusable="false" role="img" style="width: 1.5rem; height: 1.5rem; vertical-align: middle;">
+          <path d="M16.97 4.97a.75.75 0 0 0-1.06-1.06L12 7.94 8.09 3.91A.75.75 0 1 0 7.03 4.97l3.91 4.03-3.91 4.03a.75.75 0 1 0 1.06 1.06L12 10.06l3.91 4.03a.75.75 0 1 0 1.06-1.06l-3.91-4.03 3.91-4.03z"/>
         </svg>
       </button>
     </div>
@@ -197,28 +220,30 @@ function showTooltip({ element, title, description, position = "bottom", classNa
   document.body.appendChild(modal);
   const tipRect = modal.getBoundingClientRect();
   const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
-  let top = 0, left = 0;
-  switch (position) {
-    case "top":
-      top = rect.top - tipRect.height - 2 * rem;
-      left = rect.left - rem;
-      break;
-    case "right":
-      top = rect.top - rem;
-      left = rect.right + 2 * rem;
-      break;
-    case "left":
-      top = rect.top - rem;
-      left = rect.left - tipRect.width - 2 * rem;
-      break;
-    case "bottom":
-    default:
-      top = rect.bottom + 2 * rem;
-      left = rect.left - rem;
-      break;
+  if (window.innerWidth >= 800) {
+    let top = 0, left = 0;
+    switch (position) {
+      case "top":
+        top = rect.top - tipRect.height - 2 * rem;
+        left = rect.left - rem;
+        break;
+      case "right":
+        top = rect.top - rem;
+        left = rect.right + 2 * rem;
+        break;
+      case "left":
+        top = rect.top - rem;
+        left = rect.left - tipRect.width - 2 * rem;
+        break;
+      case "bottom":
+      default:
+        top = rect.bottom + 2 * rem;
+        left = rect.left - rem;
+        break;
+    }
+    modal.style.top = `${top}px`;
+    modal.style.left = `${left}px`;
   }
-  modal.style.top = `${top}px`;
-  modal.style.left = `${left}px`;
   const closeBtn = modal.querySelector("#uswds-tour-close");
   const nextBtn = modal.querySelector("#uswds-tour-next");
   const prevBtn = modal.querySelector("#uswds-tour-prev");
