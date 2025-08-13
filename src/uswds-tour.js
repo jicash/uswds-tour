@@ -90,20 +90,19 @@ function showTooltip({ element, title, description, position = 'bottom', classNa
     console.warn('USWDS-Tour: Target element not found.');
     return;
   }
-  // On mobile, scroll so the target element is positioned 2*rem above the top of the modal
-  if (window.innerWidth < 800 && target && typeof target.getBoundingClientRect === 'function') {
-    const rect = target.getBoundingClientRect();
-    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
-    const modalHeight = Math.floor(window.innerHeight / 3);
-    // The top of the modal will be at window.innerHeight - modalHeight
-    const modalTop = window.innerHeight - modalHeight;
-    // We want the target's top to be 2*rem above the modal's top
-    const desiredScroll = window.scrollY + rect.top - (modalTop - 2 * rem);
-    if (desiredScroll !== window.scrollY) {
-      window.scrollTo({ top: desiredScroll, behavior: 'smooth' });
-    }
+  // Scroll so the target element is positioned 2*rem above the top of the modal
+  let rect = getAdjustedBoundingClientRect(target);
+  const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+  const modalHeight = Math.floor(window.innerHeight / 3);
+  // The top of the modal will be at window.innerHeight - modalHeight
+  const modalTop = window.innerHeight - modalHeight;
+  // We want the target's top to be 2*rem above the modal's top
+  const desiredScroll = window.scrollY + rect.top - (modalTop - 2 * rem);
+  if (desiredScroll !== window.scrollY) {
+    console.log('Scrolling to position:', desiredScroll);
+    window.scrollTo({ top: desiredScroll, behavior: 'smooth' });
   }
-
+  rect = getAdjustedBoundingClientRect(target); // Recalculate rect after scroll
 
   document.querySelectorAll('.uswds-tour-tooltip, .uswds-tour-overlay, .usa-modal__overlay, .usa-modal').forEach(el => el.remove());
 
@@ -112,12 +111,11 @@ function showTooltip({ element, title, description, position = 'bottom', classNa
   // so it covers the entire document and does not scroll away from the content.
   // The cutout must be aligned to the target's position in the document, not just the viewport.
   // Therefore, we must add window.scrollX/Y to rect.left/top to get the correct document position.
-  const rect = target.getBoundingClientRect();
   const padding = 16; // 1rem
   const borderRadius = 12; // px, for rounded corners
   const cutout = {
-    x: rect.left + window.scrollX - padding,
-    y: rect.top + window.scrollY - padding,
+    x: rect.left - padding,
+    y: rect.top - padding,
     width: rect.width + 2 * padding,
     height: rect.height + 2 * padding
   };
@@ -224,11 +222,12 @@ function showTooltip({ element, title, description, position = 'bottom', classNa
   if (window.innerWidth < 800) {
     modal.style.position = 'fixed';
     modal.style.left = '0';
+    modal.style.right = '0';
     modal.style.bottom = '0';
     modal.style.top = '';
     modal.style.width = '100vw';
-    modal.style.maxWidth = '';
-    modal.style.minWidth = '';
+    modal.style.maxWidth = '100vw';
+    modal.style.minWidth = '100vw';
     modal.style.borderRadius = '0';
     modal.style.margin = '0';
     modal.style.height = 'auto';
@@ -285,8 +284,7 @@ function showTooltip({ element, title, description, position = 'bottom', classNa
   document.body.appendChild(modal);
 
   // Position the modal near the target element (like a tooltip)
-  const tipRect = modal.getBoundingClientRect();
-  const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+  const tipRect = getAdjustedBoundingClientRect(modal);
   if (window.innerWidth >= 800) {
     let top = 0, left = 0;
     switch (position) {
@@ -333,7 +331,6 @@ function showTooltip({ element, title, description, position = 'bottom', classNa
   }
   if (closeBtn) closeBtn.addEventListener('click', () => {
     remove();
-    if (onNext) onNext();
   });
   if (nextBtn) nextBtn.addEventListener('click', () => {
     remove();
@@ -455,3 +452,21 @@ window.USWDSTour = {
 };
 
 export { showTooltip, startTour };
+
+function getAdjustedBoundingClientRect(element) {
+  const rect = element.getBoundingClientRect();
+
+  const adjustedRect = {
+    top: rect.top + window.scrollY,
+    left: rect.left + window.scrollX,
+    bottom: rect.bottom + window.scrollY,
+    right: rect.right + window.scrollX,
+    width: rect.width,
+    height: rect.height
+  };
+
+  console.log('Adjusted Rect:', adjustedRect); // Debugging log
+  console.log('Original Rect:', rect); // Debugging log
+  return adjustedRect;
+}
+
