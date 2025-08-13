@@ -99,7 +99,6 @@ function showTooltip({ element, title, description, position = 'bottom', classNa
   // We want the target's top to be 2*rem above the modal's top
   const desiredScroll = window.scrollY + rect.top - (modalTop - 2 * rem);
   if (desiredScroll !== window.scrollY) {
-    console.log('Scrolling to position:', desiredScroll);
     window.scrollTo({ top: desiredScroll, behavior: 'smooth' });
   }
   rect = getAdjustedBoundingClientRect(target); // Recalculate rect after scroll
@@ -465,8 +464,6 @@ function getAdjustedBoundingClientRect(element) {
     height: rect.height
   };
 
-  console.log('Adjusted Rect:', adjustedRect); // Debugging log
-  console.log('Original Rect:', rect); // Debugging log
   return adjustedRect;
 }
 
