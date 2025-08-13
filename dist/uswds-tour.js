@@ -68,7 +68,6 @@ function showTooltip({ element, title, description, position = "bottom", classNa
   const modalTop = window.innerHeight - modalHeight;
   const desiredScroll = window.scrollY + rect.top - (modalTop - 2 * rem);
   if (desiredScroll !== window.scrollY) {
-    console.log("Scrolling to position:", desiredScroll);
     window.scrollTo({ top: desiredScroll, behavior: "smooth" });
   }
   rect = getAdjustedBoundingClientRect(target);
@@ -380,8 +379,6 @@ function getAdjustedBoundingClientRect(element) {
     width: rect.width,
     height: rect.height
   };
-  console.log("Adjusted Rect:", adjustedRect);
-  console.log("Original Rect:", rect);
   return adjustedRect;
 }
 export {
